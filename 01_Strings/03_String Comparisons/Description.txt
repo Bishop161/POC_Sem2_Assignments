@@ -1,2 +1,23 @@
 Ask the User for two bits of text 
 Then print out whether those to bits of text are equal.  
+# print('Python' == 'Python')
+
+# print('Python' == 'python')
+
+# print('Python' != 'python')
+
+# print('Python' == 'Pytho')
+
+#print('I love Python' < 'I love python')
+
+#print('Pythonist' > 'Python')
+
+#print('Pythonist' > 'Z')
+
+#print('20' > '8')
+
+#print(10 == '10')
+
+# print(10 != '10')
+
+# print(10 > '10')
