@@ -1,4 +1,4 @@
-bit_of_text = "" #YOUDO get this from user input.  
+bit_of_text = input("") #YOUDO get this from user input.  
 
 for char in bit_of_text:
     print(ord(char))
