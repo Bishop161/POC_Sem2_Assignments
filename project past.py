@@ -357,20 +357,44 @@ def white_dress():
                     new_row.append(color)
             white_dress_sprite.append(new_row)
         draw_sprite(white_dress_sprite)
-#def normal():
-    #if(current_sprite_name == "Peach Lost Levels", "Small Mario", "Big Mario", "Goomba"):
-        #normal_sprite = []
-        #for row in current_sprite:
-            #new_row = []
-            #for color in row:
-
-
+def normal():
+    if(current_sprite_name == "Peach Lost Levels" or current_sprite_name == "Small Mario" or current_sprite_name == "Big Mario" or current_sprite_name == "Goomba"):
+        normal_sprite = []
+        for row in current_sprite:
+            new_row = []
+            for color in row:
+                if color == y:
+                    new_row.append(w)
+                elif color == lw:
+                    new_row.append(r)
+                elif color == ls:
+                    new_row.append(s)
+                elif color == lg:
+                    new_row.append(b)
+                elif color == fw:
+                    new_row.append(r)
+                elif color == fs:
+                    new_row.append(s)
+                elif color == fr:
+                    new_row.append(b)
+                elif color == t:
+                    new_row.append(v)
+                elif color == l:
+                    new_row.append(k)
+                elif color == n:
+                    new_row.append(s)
+                elif color == k:
+                    new_row.append(d)
+                else:
+                    new_row.append(color)
+            normal_sprite.append(new_row)
+        draw_sprite(normal_sprite)
 draw_button = Button(root, text="Draw Sprite", command=draw)
 draw_button.pack()
 clear_button = Button(root, text="Clear", command=clear)
 clear_button.pack()
-#draw_normal = Button(root, text="Normal", command=normal)
-#draw_normal.pack()
+draw_normal = Button(root, text="Normal", command=normal)
+draw_normal.pack()
 draw_luigi = Button(root, text="Draw Luigi", command=luigi)
 draw_luigi.pack()
 draw_fire = Button(root, text="Draw Fire", command=fire)
