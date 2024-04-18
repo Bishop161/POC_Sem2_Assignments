@@ -1,15 +1,18 @@
 grid = [
-    ["1", "2", "3"],     # [R0C0, R0C1, R0C2]
-    ["4", "5", "6"],     # [R1C0, R1C1, R1C2]
-    ["7", "8", "9"],     # [R2C0, R2C1, R2C2]
+    ["01", "02", "03", "04", "05", "06", "07"],
+    ["08", "09", "10", "11", "12", "13", "14"],
+    ["15", "16", "17", "18", "19", "20", "21"],
+    ["22", "23", "24", "25", "26", "27", "28"],
+    ["29", "30", "31", "32", "33", "34", "35"],
+    ["36", "37", "38", "39", "40", "41", "42"],
 ]
 
-current_piece = "X"
+current_piece = "Y"
 
 def print_grid():
-    for row in range(len(grid)):
-        for col in range(len(grid[row])):
-            if col != 2:
+    for row in range(6):
+        for col in range(7):
+            if col != 6:
                 print(grid[row][col], end="  ")            
             else:
                 print(grid[row][col])
@@ -46,7 +49,7 @@ def place_piece(grid_spot : int):
         row = get_row(grid_spot)
         col = get_col(grid_spot)
         grid_value = grid[row][col]
-        if (not grid_value.__eq__("X") and not grid_value.__eq__("O")):
+        if (not grid_value.__eq__("R") and not grid_value.__eq__("Y")):
             break
         user_choice = ""
         while (is_bad_num_string(user_choice)):
@@ -114,7 +117,7 @@ def game_loop():
         if(check_game_over()):
             print_grid()
             break
-        current_piece = "O" if current_piece.__eq__("X") else "X"
+        current_piece = "Y" if current_piece.__eq__("R") else "R"
         user_choice = ""
     print("GAME OVER")
         
