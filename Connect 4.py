@@ -1,13 +1,17 @@
 grid = [
-    ["01", "02", "03", "04", "05", "06", "07"],
-    ["08", "09", "10", "11", "12", "13", "14"],
-    ["15", "16", "17", "18", "19", "20", "21"],
-    ["22", "23", "24", "25", "26", "27", "28"],
-    ["29", "30", "31", "32", "33", "34", "35"],
-    ["36", "37", "38", "39", "40", "41", "42"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
 ]
 
-current_piece = "Y"
+current_piece = "R"
+
+last_row = -1
+last_col = -1
+remaining_spots = 42
 
 def print_grid():
     for row in range(6):
@@ -19,7 +23,7 @@ def print_grid():
                 print()
 
 def is_bad_num_string(choice : str):
-    if (choice.isnumeric() and int(choice) >= 1 and int(choice) <= 9):
+    if (choice.isnumeric() and int(choice) >= 0 and int(choice) <= 6):
         return False
     return True
                 
@@ -44,19 +48,14 @@ def get_col(grid_spot):
     else:
         return 2
     
-def place_piece(grid_spot : int):
+def place_piece(col : int):
+    global last_row
+    global last_col
+    global remaining_spots
     while(True):
-        row = get_row(grid_spot)
-        col = get_col(grid_spot)
-        grid_value = grid[row][col]
-        if (not grid_value.__eq__("R") and not grid_value.__eq__("Y")):
-            break
-        user_choice = ""
-        while (is_bad_num_string(user_choice)):
-            user_choice = input(
-                "Enter a number (1-9) where to put the piece: ")
-        grid_spot = int(user_choice)
-    grid[row][col] = current_piece 
+        row = 5
+        while(row >= 0):
+        
 
 def check_row():
     for row in range(3):
