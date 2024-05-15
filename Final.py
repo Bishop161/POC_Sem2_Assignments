@@ -48,7 +48,7 @@ class Game(tk.Frame):
     def draw_text(self, x, y, text, size="40"):
         font = ("Helvetica", size)
         return self.canvas.create_text(x, y, text=text, font=font)
-    
+   
     def update_lives_text(self):
         text = "Lives: %s" % self.lives
         if self.hud == None:
@@ -57,9 +57,36 @@ class Game(tk.Frame):
             self.canvas.itemconfig(self.hud, text=text)
 
     def start_game(self):
-        pass
+        self.canvas.unbind("<space>")
+        self.canvas.delete(self.text)
+        self.paddle.ball = None
+        self.game_loop()
 
-    
+    def game_loop(self):
+        self.check_collisions()
+        num_bricks = len(self.canvas.find_withtag("brick"))
+        if num_bricks == 0:
+            self.ball = None
+            self.draw_text(300, 200, "You win!")
+        elif self.ball.get_position()[3] >= self.height:
+            self.ball.speed = None
+            self.lives -= 1
+            if self.lives < 0:
+                self.draw_text(300, 200, "Game Over")
+            else:
+                self.after(1000, self.setup_game)
+        else:
+            self.ball.update()
+            self.after(50, self.game_loop)
+
+    def check_collisions(self):
+        ball_coords = self.ball.get_position()
+        items = self.canvas.find_overlapping(*ball_coords)
+        objects = [self.items[x] for x in items if x in self.items]
+        self.ball.collide(objects)
+
+
+   
 
 
 class GameObject(object):
@@ -69,7 +96,7 @@ class GameObject(object):
 
     def get_position(self):
         return self.canvas.coords(self.item)
-    
+   
     def move(self, x, y):
         self.canvas.move(self.item, x, y)
 
@@ -77,39 +104,69 @@ class GameObject(object):
         self.canvas.delete(self.item)
 
 class Ball(GameObject):
-    def __init__(self, canvas, x, y):  #(x, y) is the center of the ball
-        #YOUDO-01: create a radius variable for self and set to 10
-        #YOUDO-02: create a direction variable for self and set to [1, -1]
-        #This represents the speed of the ball in the x and y direction.  Example:  [xspeed, yspeed]  
-        #YOUDO-03:  create a speed variable for self and set to 10
-        #YOUDO-04:  create an x1 variable and set to x - self's radius
-        #YOUDO-05:  create an y1 variable and set to y - self's radius
-        #YOUDO-06:  create an x2 variable and set to x + self's radius
-        #YOUDO-07:  create an y2 variable and set to y + self's radius  
-        #YOUDO-08:  create a color variable and set to "white"
+    def __init__(self, canvas, x, y):
+        self.radius = 10
+        self.direction = [1, -1]
+        self.speed = 10
+        x1 = x - self.radius
+        y1 = y - self.radius
+        x2 = x + self.radius
+        y2 = y + self.radius  
+        color = "white"
         item = canvas.create_oval(x1, y1, x2, y2, fill=color)
         super(Ball, self).__init__(canvas, item)
+       
+    def update(self):
+        coords = self.get_position()
+        width = self.canvas.winfo_width()
+        if coords[0] <= 0 or coords[2] >= width:
+            self.direction[0] *= -1
+        if coords[1] <= 0:
+            self.direction[1] *= -1
+        x = self.direction[0] * self.speed
+        y = self.direction[1] * self.speed
+        self.move(x, y)
+
+    def collide(self, game_objects):
+        coords = self.get_position()
+        x1 = coords[0]
+        x2 = coords[2]
+        x = (x1 + x2) / 2
+        if len(game_objects) > 1:
+            self.direction[1] *= -1
+        elif len(game_objects) == 1:
+            game_object = game_objects[0]
+            coords = game_object.get_position()
+            if x > coords[2]:
+                self.direction[0] = 1
+            elif x < coords[0]:
+                self.direction[0] = -1
+            else:
+                self.direction[1] *= -1
+       
+        for game_object in game_objects:
+            if(isinstance(game_object, Brick)):
+                game_object.hit()
 
 class Paddle(GameObject):
-    def __init__(self, canvas, x, y):  #(x, y) is the center of the paddle
-        #YOUDO-09:  create a width variable for self and set to 80
-        #YOUDO-10:  create a height variable for self and set to 10
-        #YOUDO-11:  create a ball variable for self and set to None
-        #YOUDO-12:  create an x1 variable and set to x - self's width / 2
-        #YOUDO-13:  create an y1 variable and set to y - self's height / 2
-        #YOUDO-14:  create an x2 variable and set to x + self's width / 2
-        #YOUDO-15:  create an y2 variable and set to y + self's height / 2
-        #YOUDO-16:  create a color variable and set to "blue"
-        #YOUDO-17:  use create_rectangle on canvas to create an item variable with x1, y1, x2, y2, color
+    def __init__(self, canvas, x, y):  
+        self.width = 80
+        self.height = 10
+        self.ball = None
+        x1 = x - self.width / 2
+        y1 = y - self.height / 2
+        x2 = x + self.width / 2
+        y2 = y + self.height / 2
+        color = "blue"
+        item = canvas.create_rectangle(x1, y1, x2, y2, fill=color)
         super(Paddle, self).__init__(canvas, item)
-        
 
     def set_ball(self, ball):
         self.ball = ball
 
     def move(self, offset):
         coords = self.get_position()
-        width = self.canvas.winfo.width()
+        width = self.canvas.winfo_width()
         x1 = coords[0]
         y1 = coords[1]
         x2 = coords[2]
@@ -123,22 +180,27 @@ class Brick(GameObject):
     COLORS = {1 : "#999999", 2 : "#555555", 3 : "#222222"}
 
     def __init__(self, canvas, x, y, hits):
-        #YOUDO-18:  create a width variable for self and initialize to 75
-        #YOUDO-19:  create a height variable for self and initialize to 20
-        #YOUDO-20:  create a hits variable for self and initialize to hits 
+        self.width = 75
+        self.height = 20
+        self.hits = hits
         color = Brick.COLORS[hits]
-        #YOUDO-21:  create an x1 variable and set to x - self's width / 2
-        #YOUDO-22:  create an y1 variable and set to y - self's height / 2
-        #YOUDO-23:  create an x2 variable and set to x + self's width / 2
-        #YOUDO-24:  create an y2 variable and set to y + self's height / 2
-        #YOUDO-25:  use create_rectangle on canvas to create an item variable with x1, y1, x2, y2, color, tags="brick"        
+        x1 = x - self.width / 2
+        y1 = y - self.height / 2
+        x2 = x + self.width / 2
+        y2 = y + self.height / 2
+        item = canvas.create_rectangle(x1, y1, x2, y2, fill=color, tags="brick")        
         super(Brick, self).__init__(canvas, item)
 
     def hit(self):
-        #YOUDO-26:  subtract one from self.hits
-        #YOUDO-27:  check if self.hits is equal to 0.  If it is call self.delete().  If not 
-        #YOUDO-27-part2:  call self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits])
-        pass #YOUDO-28:  Remove this pass
+        self.hits -= 1
+        if self.hits == 0:  
+            self.delete()
+       
+        else:
+            self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits])
+       
+
+
 
 
 if __name__ == "__main__":    
